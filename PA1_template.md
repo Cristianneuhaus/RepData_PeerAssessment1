@@ -6,7 +6,8 @@ output:
 ---
 
 
-```{r}
+
+```r
         knitr::opts_chunk$set(echo=TRUE, warning=FALSE, message=FALSE)
         #setoptions, echo=TRUE
 ```
@@ -20,8 +21,8 @@ Show any code that is needed to
  
 ###1. Code for reading in the dataset and/or processing the data
 
-```{r}
 
+```r
 file_path <- "/Users/cn03881/Documents/R/W2_Peer-graded Assigment 1/activity.csv"
 amd <- read.csv(file_path, header = TRUE)
 
@@ -36,6 +37,17 @@ steps <- amd %>% group_by(date) %>% summarize(steps = sum(steps))
 head(steps,5)
 ```
 
+```
+## # A tibble: 5 x 2
+##   date       steps
+##   <date>     <int>
+## 1 2012-10-02   126
+## 2 2012-10-03 11352
+## 3 2012-10-04 12116
+## 4 2012-10-05 13294
+## 5 2012-10-06 15420
+```
+
 
 ## What is mean total number of steps taken per day?
 What is mean total number of steps taken per day?
@@ -47,24 +59,36 @@ For this part of the assignment, you can ignore the missing values in the datase
 
 ###2. Histogram of the total number of steps taken each day
 
-```{r}
 
+```r
 hist(steps$steps, main = "Histogram of the total number of steps taken each day", col = "green", xlab = "Date")
-
 ```
+
+![](PA1_template_files/figure-html/unnamed-chunk-3-1.png)<!-- -->
 
 ###3. Mean and median number of steps taken each day
 
-```{r}
 
+```r
 x<-mean(steps$steps)
 x = as.integer(x)
 y <- median(steps$steps)
 y = as.integer(y)
 x
+```
+
+```
+## [1] 10766
+```
+
+```r
 y
 ```
-####The mean is **`r x`** and the median is **`r y`**
+
+```
+## [1] 10765
+```
+####The mean is **10766** and the median is **10765**
 
 ## What is the average daily activity pattern?
  * Make a time series plot (i.e. \color{red}{\verb|type = "l"|}type="l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis)
@@ -72,30 +96,48 @@ y
 
 ###4. Time series plot of the average number of steps taken
 
-```{r}
+
+```r
 library(ggplot2)
 steps <- amd %>% group_by(interval) %>% summarize(steps = mean(steps))
 head(steps,5)
+```
 
+```
+## # A tibble: 5 x 2
+##   interval  steps
+##      <int>  <dbl>
+## 1        0 1.72  
+## 2        5 0.340 
+## 3       10 0.132 
+## 4       15 0.151 
+## 5       20 0.0755
 ```
 
 What is the average daily activity pattern?
 
-```{r}
 
+```r
 ggplot(steps, aes(x=interval, y=steps)) + geom_line(color = "red")
-
 ```
+
+![](PA1_template_files/figure-html/unnamed-chunk-6-1.png)<!-- -->
 
 ###5. The 5-minute interval that, on average, contains the maximum number of steps
 
-```{r}
 
+```r
 max <- steps[which.max(steps$steps),]
 max
+```
 
 ```
-####The maximum number of steps on average is **`r max$steps`** and it is located at the interval **`r max$interval`**
+## # A tibble: 1 x 2
+##   interval steps
+##      <int> <dbl>
+## 1      835  206.
+```
+####The maximum number of steps on average is **206.1698113** and it is located at the interval **835**
 
 ## Imputing missing values
 Note that there are a number of days/intervals where there are missing values (coded as \color{red}{\verb|NA|}NA). The presence of missing days may introduce bias into some calculations or summaries of the data.
@@ -108,8 +150,8 @@ Note that there are a number of days/intervals where there are missing values (c
 ###6. Code to describe and show a strategy for imputing missing data
 
 Create a new dataset that is equal to the original dataset but with the missing data filled in.
-```{r}
 
+```r
 amd2 <- read.csv(file_path, header = TRUE)
 
 # convert from factor to Date // class = Date
@@ -117,46 +159,70 @@ amd2$date <- ymd(amd2$date)
 
 miss <- sum(is.na(amd2$steps))
 miss
-
 ```
 
-####Total missing values = **`r miss`**
+```
+## [1] 2304
+```
+
+####Total missing values = **2304**
 
 ###7. Histogram of the total number of steps taken each day after missing values are imputed
 
 Introducing nean values to missing data
 
-```{r}
 
+```r
 nas <- is.na(amd2$steps)
 mean_interval <- tapply(amd2$steps, amd2$interval, mean, na.rm=TRUE, simplify=TRUE)
 amd2$steps[nas] <- mean_interval[as.character(amd2$interval[nas])]
 
 amd2_sumry <- amd2 %>% group_by(date) %>% summarize(steps = sum(steps))
 head(amd2_sumry,5)
+```
 
+```
+## # A tibble: 5 x 2
+##   date        steps
+##   <date>      <dbl>
+## 1 2012-10-01 10766.
+## 2 2012-10-02   126 
+## 3 2012-10-03 11352 
+## 4 2012-10-04 12116 
+## 5 2012-10-05 13294
 ```
 
 
-```{r}
 
+```r
 hist(amd2_sumry$steps, main = "Histogram of the total number of steps taken each day", col = "red", xlab = "Date")
-
 ```
+
+![](PA1_template_files/figure-html/unnamed-chunk-10-1.png)<!-- -->
 Mean and median number of steps taken each day with missing values
 
 
-```{r}
 
+```r
 x<-mean(amd2_sumry$steps)
 x = as.integer(x)
 y <- median(amd2_sumry$steps)
 y = as.integer(y)
 x
-y
+```
 
 ```
-####The mean is **`r x`** and the median is **`r y`**
+## [1] 10766
+```
+
+```r
+y
+```
+
+```
+## [1] 10766
+```
+####The mean is **10766** and the median is **10766**
 
 ## Are there differences in activity patterns between weekdays and weekends?
 For this part the \color{red}{\verb|weekdays()|}weekdays() function may be of some help here. Use the dataset with the filled-in missing values for this part.
@@ -166,24 +232,32 @@ For this part the \color{red}{\verb|weekdays()|}weekdays() function may be of so
 
 ###8. Panel plot comparing the average number of steps taken per 5-minute interval across weekdays and weekends
 
-```{r}
 
-
+```r
 amd2 <- mutate(amd2, weektype = ifelse(weekdays(amd2$date) == "Saturday" | weekdays(amd2$date) == "Sunday", "weekend", "weekday"))
 
 amd2$weektype <- as.factor(amd2$weektype)
 head(amd2,5)
-
 ```
 
-```{r}
+```
+##       steps       date interval weektype
+## 1 1.7169811 2012-10-01        0  weekday
+## 2 0.3396226 2012-10-01        5  weekday
+## 3 0.1320755 2012-10-01       10  weekday
+## 4 0.1509434 2012-10-01       15  weekday
+## 5 0.0754717 2012-10-01       20  weekday
+```
 
+
+```r
 data_sumry <- amd2 %>% group_by(interval, weektype) %>% summarise(steps = mean(steps))
 
 g <- ggplot(data_sumry, aes(x=interval, y=steps, color = weektype)) 
 
 g + geom_line() + facet_wrap(~weektype, ncol = 1, nrow=2)
-
 ```
+
+![](PA1_template_files/figure-html/unnamed-chunk-13-1.png)<!-- -->
 
 ###9.All of the R code needed to reproduce the results (numbers, plots, etc.) in the report
